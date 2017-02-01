@@ -6,6 +6,7 @@ use Getopt::Long;
 use Net::OAI::Harvester;
 use Time::HiRes qw(sleep);
 use Time::localtime;
+use File::Path;
 use File::Copy;
 use XML::LibXML;
 
@@ -40,19 +41,31 @@ sub main
 		
                my $retrieved = 0; 
                
-		my $timestamp = $opts{timestamp};
+	       my $timestamp = $opts{timestamp};
+		my $range = $opts{from} . '-' . $opts{until};
 
-	 	my $moved = 'harvested/' . $timestamp . '_' . $count . '.xml';
+		my $setname = $opts{set};
+		$setname =~ s/:/-/;
+	
+		my $path = 'harvested/' . $setname . '_' . $range . '/';
+	 	my $filename = $timestamp . '_' . $count . '.xml';
+		my $fullpath = $path . $filename;
 
-		move($records->file, $moved)
+		if (! -d $path)
+		{
+			my $dirs = eval { mkpath($path) };
+			die "Failed to create $path: $@\n" unless $dirs;
+		}
+
+		move($records->file, $fullpath)
     		or die "move failed: $!";
 
-		print "Records written to $moved\n";
+		print "Records written to $fullpath\n";
 
 		my $rToken = $records->resumptionToken();
                 
                 if ($check == 0){
-                  #$rToken->settoken('20120120110813:marc21:20080101000000:20081231235959:30500:hathitrust');
+                  #$rToken->settoken('20170125154806:marc21:19000101000000:20170125235959:450000:hathitrust:pd');
                   $check = 1;
                }
 	   if ( $rToken ) { 

@@ -1,4 +1,4 @@
 *.swp
-deleteETDs/*.xml
-deleteETDs/*.tar.gz
-harvested/*.xml
+deleteETDs/
+harvested/
+toDelete/
